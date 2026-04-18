@@ -21,7 +21,7 @@ def load_user(user_id):
 
 @app.route('/')
 def hello():
-    return 'Hello WAP!'
+    return render_template('panorama.html')
 
 @app.route('/logout')
 @login_required

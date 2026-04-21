@@ -19,10 +19,6 @@ def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.get(User,user_id)
 
-@app.route('/')
-def hello():
-    return 'Hello WAP!'
-
 @app.route('/logout')
 @login_required
 def logout():
@@ -53,7 +49,7 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
-def reqister():
+def register():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -72,4 +68,22 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
-app.run(port=5000, host='127.0.0.1')
+
+photo_url = '/static/images/main_1.jpg'
+
+@app.route('/')
+def main():
+    return render_template('entrance.html', photo_url=photo_url)
+
+
+@app.context_processor
+def inject_user():
+    return dict(current_user=current_user)
+
+@app.route('/stats')
+@login_required
+def stats():
+    return render_template('stats.html')
+
+if __name__ == '__main__':
+    app.run(debug=True)

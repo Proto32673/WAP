@@ -1,0 +1,29 @@
+/* Вставляем в <style> внутри base.html */
+:root {
+    /* Палитра для светлой темы */
+    --bg-main: #f8f9fa;
+    --bg-card: #ffffff;
+    --text-primary: #1a1d23;
+    --text-muted: #6c757d;
+    --accent-color: #28a745; /* Твой фирменный зеленый */
+    --border-color: #dee2e6;
+    --nav-bg: rgba(255, 255, 255, 0.8);
+}
+
+[data-bs-theme="dark"] {
+    /* Палитра для темной темы (Deep Navy/Charcoal) */
+    --bg-main: #0f172a;
+    --bg-card: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent-color: #4ade80;
+    --border-color: #334155;
+    --nav-bg: rgba(15, 23, 42, 0.8);
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: all 0.3s ease;
+}

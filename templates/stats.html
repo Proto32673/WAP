@@ -24,48 +24,43 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
                         <div class="row g-3">
-                            <!-- Дата регистрации -->
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3">
-                                    <div class="text-start">
-                                        <i class="bi bi-calendar-plus fs-4 text-success"></i>
-                                        <span class="ms-2 fw-bold">Дата регистрации:</span>
-                                    </div>
-                                    <div>
-                                        <span class="badge bg-success fs-6 px-3 py-2">
-                                            {% if current_user.created_date %}
-                                                {{ current_user.created_date.strftime('%d.%m.%Y') }}
-                                            {% else %}
-                                                Потом доделаю
-                                            {% endif %}
-                                        </span>
-                                    </div>
+                            <div class="col-12 mb-3"> <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
+                                <div class="text-start">
+                                    <i class="bi bi-calendar-plus fs-4 text-success"></i>
+                                    <span class="ms-2 fw-bold stat-label">Дата регистрации:</span>
                                 </div>
-                            </div>
-
-                            <!-- Максимальный счет -->
-                            <div class="col-12">
-                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded-3">
-                                    <div class="text-start">
-                                        <i class="bi bi-trophy fs-4 text-warning"></i>
-                                        <span class="ms-2 fw-bold">Максимальный счет:</span>
-                                    </div>
-                                    <div>
-                                        <span class="badge bg-success fs-6 px-3 py-2">
-                                            {% if current_user.max_score %}
-                                                {{ current_user.max_score }}
-                                            {% else %}
-                                                Тоже потом сделаю
-                                            {% endif %}
-                                        </span>
-                                    </div>
+                                <div>
+                                    <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
+                                        {% if current_user.created_date %}
+                                            {{ current_user.created_date.strftime('%d.%m.%Y') }}
+                                        {% else %}
+                                            Потом доделаю
+                                        {% endif %}
+                                    </span>
                                 </div>
                             </div>
                         </div>
+
+                        <div class="col-12 mb-3">
+                            <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
+                                <div class="text-start">
+                                    <i class="bi bi-trophy fs-4 text-warning"></i>
+                                    <span class="ms-2 fw-bold stat-label">Максимальный счет:</span>
+                                </div>
+                                <div>
+                                    <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
+                                        {% if current_user.max_score %}
+                                            {{ current_user.max_score }}
+                                        {% else %}
+                                            Тоже потом доделаю
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
                     </div>
                 </div>
-
-                <!-- Кнопки действий -->
                 <div class="d-flex gap-3 justify-content-center">
                     <a href="/" class="btn btn-outline-success px-4">
                         На главную
@@ -78,75 +73,6 @@
         </div>
     </div>
 </div>
-
-<style>
-    .user-avatar-large {
-        width: 120px;
-        height: 120px;
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 48px;
-        margin: 0 auto;
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        transition: transform 0.2s;
-    }
-    .user-avatar-large:hover {
-        transform: scale(1.05);
-    }
-
-    .btn-success {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        border: none;
-        transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-success:hover {
-        background: linear-gradient(135deg, #1e7e34 0%, #155724 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-    }
-
-    .btn-outline-success {
-        border: 2px solid #28a745;
-        color: #28a745;
-        transition: all 0.2s;
-    }
-
-    .btn-outline-success:hover {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-        border-color: transparent;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
-        color: white;
-    }
-
-    .bg-light {
-        background-color: #f8f9fa !important;
-    }
-
-    .rounded-3 {
-        border-radius: 1rem !important;
-    }
-
-    .text-success {
-        color: #28a745 !important;
-    }
-
-    .badge {
-        font-weight: 600;
-        border-radius: 10px;
-        display: inline-block;
-        min-width: 120px;
-    }
-
-    .bg-success {
-        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
-    }
-</style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 {% endblock %}

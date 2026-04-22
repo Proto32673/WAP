@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const html = document.documentElement;
     const switcher = document.getElementById('themeSwitcher');
-
-    // Функция обновления иконки (опционально)
     const updateIcon = (theme) => {
         switcher.innerHTML = theme === 'dark' ? '☀️' : '🌙';
     };

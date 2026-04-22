@@ -1,41 +1,40 @@
 ymaps.ready(function () {
     if (!ymaps.panorama.isSupported()) return;
+    window.findWorldPano = function(attempts) {
+        if (attempts <= 0) return;
+        fetch('/api/get_location')
+            .then(response => response.json())
+            .then(coords => {
+                ymaps.panorama.locate([coords.lat, coords.lng]).done(function (panoramas) {
+                    if (panoramas.length > 0) {
+                        var panorama = panoramas[0];
+                        var proto = Object.getPrototypeOf(panorama);
+                        proto.getMarkers = function () { return []; };
+                        proto.getConnectionMarkers = function () { return []; };
 
-    window.get_ypano = function (x, y) {
-        ymaps.panorama.locate([y, x]).done(
-            function (pano_list) {
-                if (pano_list.length > 0) {
-                    var panorama = pano_list[0];
-                    var proto = Object.getPrototypeOf(panorama);
-                    proto.getMarkers = function () { return []; };
-                    proto.getConnectionMarkers = function () { return []; };
-                    put_pano_in_player(panorama);
-                } else {
-                    console.log('no pano here');
-                }
-            }
-        );
+                        put_pano_in_player(panorama);
+                    } else {
+                        findWorldPano(attempts - 1);
+                    }
+                });
+            });
     }
-
     window.put_pano_in_player = function (panorama) {
         if (window.player) {
             window.player.setPanorama(panorama);
+            window.player.setDirection([Math.random() * 360, 0]);
         } else {
             window.player = new ymaps.panorama.Player(
                 'player1',
                 panorama,
                 {
-                    direction: [0, 0],
+                    direction: [Math.random() * 360, 0],
                     span: [80, 80],
-                    controls: 'zoomControl'
+                    controls: [],
+                    suppressMapOpenBlock: true
                 }
             );
-
-            window.player.events.add(['directionchange', 'spanchange'], function () {
-                if (typeof get_hs === "function") get_hs(window.player);
-            });
         }
-        $('[class*=panorama-control]').css({"display": "none"});
     }
-    get_ypano(37.588264, 55.733685);
+    findWorldPano(5);
 });

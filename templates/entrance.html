@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Географический вопроситель
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6 text-center">
+
+            <!-- Заголовок -->
+            <div class="mb-4">
+                <h1 class="display-4 fw-bold text-success">
+                    Географический вопроситель
+                </h1>
+                <p class="lead text-muted">Геогессер</p>
+            </div>
+
+            <!-- Изображение -->
+            {% if photo_url %}
+            <div class="mb-4">
+                <img src="{{ photo_url }}"
+                     alt="Логотип игры"
+                     class="img-fluid rounded-3 shadow"
+                     style="max-width: 100%; height: auto;">
+            </div>
+            {% endif %}
+
+            <!-- Информация о проекте -->
+            <div class="mb-5">
+                <div class="p-4 info-block rounded-3">
+                    <h3 class="h4 mb-3">О проекте</h3>
+                    <p class="info-text">
+                        GeoGuessr — браузерная игра, разработанная шведским программистом Антоном Валленом.
+                        В игре используются карты Google Street View,
+                        игроку требуется угадать местоположение улицы/переулка/шоссе в мире,
+                        пометив его на карте Google Maps.
+                        У нас почти тоже самое, только свое.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Кнопка для начала игры -->
+            <div>
+                <a href="/zaglushka" class="btn btn-success btn-lg px-5">
+                    Начать игру
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

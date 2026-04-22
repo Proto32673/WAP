@@ -1,31 +1,41 @@
 ymaps.ready(function () {
-    // Для начала проверим, поддерживает ли плеер браузер пользователя.
-    if (!ymaps.panorama.isSupported()) {
-        // Если нет, то просто ничего не будем делать.
-        return;
+    if (!ymaps.panorama.isSupported()) return;
+
+    window.get_ypano = function (x, y) {
+        ymaps.panorama.locate([y, x]).done(
+            function (pano_list) {
+                if (pano_list.length > 0) {
+                    var panorama = pano_list[0];
+                    var proto = Object.getPrototypeOf(panorama);
+                    proto.getMarkers = function () { return []; };
+                    proto.getConnectionMarkers = function () { return []; };
+                    put_pano_in_player(panorama);
+                } else {
+                    console.log('no pano here');
+                }
+            }
+        );
     }
 
-    // Ищем панораму в переданной точке.
-    ymaps.panorama.locate([55.733685, 37.588264]).done(
-        function (panoramas) {
-            // Убеждаемся, что найдена хотя бы одна панорама.
-            if (panoramas.length > 0) {
-                // Создаем плеер с одной из полученных панорам.
-                var player = new ymaps.panorama.Player(
-                    "player1",
-                    // Панорамы в ответе отсортированы по расстоянию
-                    // от переданной в panorama.locate точки. Выбираем первую,
-                    // она будет ближайшей.
-                    panoramas[0],
-                    // Зададим направление взгляда, отличное от значения
-                    // по умолчанию.
-                    { direction: [256, 16] }
-                );
-            }
-        },
-        function (error) {
-            // Если что-то пошло не так, сообщим об этом пользователю.
-            alert(error.message);
+    window.put_pano_in_player = function (panorama) {
+        if (window.player) {
+            window.player.setPanorama(panorama);
+        } else {
+            window.player = new ymaps.panorama.Player(
+                'player1',
+                panorama,
+                {
+                    direction: [0, 0],
+                    span: [80, 80],
+                    controls: 'zoomControl'
+                }
+            );
+
+            window.player.events.add(['directionchange', 'spanchange'], function () {
+                if (typeof get_hs === "function") get_hs(window.player);
+            });
         }
-    );
+        $('[class*=panorama-control]').css({"display": "none"});
+    }
+    get_ypano(37.588264, 55.733685);
 });

@@ -17,6 +17,14 @@
             .player {
                 height: 100%;
             }
+            [class*="ymaps-2-1-79-panorama-gotoymaps"] {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+                height: 0 !important;
+                width: 0 !important;
+            }
         </style>
         <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=722f4f80-99eb-47d8-af1f-0eff526f8546"></script>
         <script src="{{ url_for('static', filename='js/panorama_basics.js') }}"></script>

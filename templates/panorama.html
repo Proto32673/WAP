@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>Вставка на страницу панорам Яндекса</title>
+        <meta charset="utf-8" />
+
+        <style>
+            html,
+            body,
+            .player {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            .player {
+                height: 100%;
+            }
+            [class*="ymaps-2-1-79-panorama-gotoymaps"] {
+                display: none !important;
+                opacity: 0 !important;
+                visibility: hidden !important;
+                pointer-events: none !important;
+                height: 0 !important;
+                width: 0 !important;
+            }
+        </style>
+        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=722f4f80-99eb-47d8-af1f-0eff526f8546"></script>
+        <script src="{{ url_for('static', filename='js/panorama_basics.js') }}"></script>
+    </head>
+    <body>
+        <div id="player1" class="player"></div>
+    </body>
+</html>

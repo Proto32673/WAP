@@ -1,12 +1,18 @@
-from flask import Flask, redirect, render_template
+from flask import Flask, redirect, render_template, jsonify
 from flask_login import logout_user, login_required, login_user, current_user, LoginManager
 from forms.LoginForm import LoginForm
 from forms.Users import RegisterForm
 from data.User import User
+from data.distance import lonlat_distance
 from data import db_session
 import requests
+from flask_restful import Api
+from data.Game import Location
 
 db_session.global_init("db/geo.db")
+
+
+photo_url = '/static/images/main_1.jpg'
 
 
 app = Flask(__name__)
@@ -14,10 +20,16 @@ app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+api = Api(app)
+api.add_resource(Location, '/api/location')
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.get(User,user_id)
+
 
 @app.route('/logout')
 @login_required
@@ -48,6 +60,7 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -69,8 +82,6 @@ def register():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-photo_url = '/static/images/main_1.jpg'
-
 @app.route('/')
 def main():
     return render_template('entrance.html', photo_url=photo_url)
@@ -80,10 +91,17 @@ def main():
 def inject_user():
     return dict(current_user=current_user)
 
+
 @app.route('/stats')
 @login_required
 def stats():
     return render_template('stats.html')
+
+
+@app.route('/game')
+def game():
+    return render_template('panorama.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

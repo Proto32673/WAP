@@ -2,7 +2,7 @@ ymaps.ready(function () {
     if (!ymaps.panorama.isSupported()) return;
     window.findWorldPano = function(attempts) {
         if (attempts <= 0) return;
-        fetch('/api/get_location')
+        fetch('/api/location')
             .then(response => response.json())
             .then(coords => {
                 ymaps.panorama.locate([coords.lat, coords.lng]).done(function (panoramas) {

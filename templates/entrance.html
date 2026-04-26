@@ -44,9 +44,46 @@
             <!-- Кнопка для начала игры -->
             <div>
                 <a href="/game" class="btn btn-success btn-lg px-5">
-                    Начать игру
+                    Начать одиночную игру
                 </a>
             </div>
+            <br>
+
+            </br>
+            <div>
+                <a href="/hub" class="btn btn-success btn-lg px-5">
+                    Создать комнату
+                </a>
+            </div>
+            <br>
+
+            </br>
+            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
+                Присоединиться к комнате
+            </button>
+            <div class="modal fade" id="joinRoomModal" tabindex="-1" aria-labelledby="joinRoomModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="joinRoomModalLabel">Ввод кода комнаты</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <p class="mb-4">Введите 4-значный код, который дал вам создатель комнаты</p>
+
+                            <div class="d-flex justify-content-center gap-3 mb-4" id="pin-container">
+                                <input type="text" class="form-control pin-input" maxlength="1" inputmode="numeric" autofocus>
+                                <input type="text" class="form-control pin-input" maxlength="1" inputmode="numeric">
+                                <input type="text" class="form-control pin-input" maxlength="1" inputmode="numeric">
+                                <input type="text" class="form-control pin-input" maxlength="1" inputmode="numeric">
+                            </div>
+
+                            <button id="join-btn" class="btn btn-success w-100" disabled>Войти в комнату</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script src="{{ url_for('static', filename='js/JoinRoomLogic.js') }}"></script>
         </div>
     </div>
 </div>

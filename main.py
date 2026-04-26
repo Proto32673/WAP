@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, jsonify
+from flask import Flask, redirect, render_template, jsonify, session
 from flask_login import logout_user, login_required, login_user, current_user, LoginManager
 from forms.LoginForm import LoginForm
 from forms.Users import RegisterForm
@@ -101,6 +101,12 @@ def stats():
 @app.route('/game')
 def game():
     return render_template('panorama.html')
+
+
+@app.route('/hub')
+@login_required
+def game_wf():
+    return render_template('hub.html')
 
 
 if __name__ == '__main__':

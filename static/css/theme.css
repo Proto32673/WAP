@@ -129,3 +129,21 @@
 [data-bs-theme="dark"] .bi-success {
     color: #4ade80 !important;
 }
+.pin-input {
+    width: 60px;
+    height: 70px;
+    font-size: 32px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 10px;
+    -moz-appearance: textfield;
+}
+.pin-input::-webkit-outer-spin-button,
+.pin-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.pin-input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}

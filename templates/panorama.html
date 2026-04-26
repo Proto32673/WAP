@@ -1,35 +1,290 @@
 <!DOCTYPE html>
 <html lang="ru">
-    <head>
-        <title>Вставка на страницу панорам Яндекса</title>
-        <meta charset="utf-8" />
+<head>
+    <title>Географический вопроситель - Панорама</title>
+    <meta charset="utf-8" />
 
-        <style>
-            html,
-            body,
-            .player {
-                width: 100%;
-                height: 100%;
-                margin: 0;
-                padding: 0;
-            }
+    <style>
+        html, body, .player {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
 
-            .player {
-                height: 100%;
+        .player {
+            height: 100%;
+        }
+
+        [class*="ymaps-2-1-79-panorama-gotoymaps"] {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            width: 0 !important;
+        }
+
+        /* Стиль для кнопки ответа */
+        .answer-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 32px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .answer-btn:hover {
+            transform: translateX(-50%) scale(1.05);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        /* Стили для меню */
+        .menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .menu-overlay.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .menu-container {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 35px;
+            min-width: 320px;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .menu-overlay.active .menu-container {
+            transform: scale(1);
+        }
+
+        .menu-title {
+            color: #fff;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #28a745;
+            padding-bottom: 15px;
+        }
+
+        .menu-item {
+            margin: 15px 0;
+        }
+
+        .menu-btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-resume {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: #000;
+        }
+
+        .btn-exit {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+
+        /* Кнопка открытия меню (три полоски) */
+        .menu-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            border: none;
+            border-radius: 10px;
+            width: 45px;
+            height: 45px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .menu-button:hover {
+            background: rgba(40, 167, 69, 0.9);
+            transform: scale(1.05);
+        }
+
+        .menu-button svg {
+            width: 24px;
+            height: 24px;
+            fill: white;
+        }
+
+        .menu-instruction {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="player1" class="player"></div>
+
+    <!-- Кнопка ответа-->
+    <button class="answer-btn" id="answerBtn">ОТВЕТИТЬ</button>
+
+    <!-- Кнопка открытия меню -->
+    <button class="menu-button" id="menuButton" title="Меню (ESC)">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+        </svg>
+    </button>
+
+    <!-- Меню -->
+    <div class="menu-overlay" id="menuOverlay">
+        <div class="menu-container">
+            <div class="menu-title">МЕНЮ</div>
+            <div class="menu-item">
+                <button class="menu-btn btn-resume" id="resumeBtn">ПРОДОЛЖИТЬ</button>
+            </div>
+            <div class="menu-item">
+                <button class="menu-btn btn-restart" id="restartBtn">НАЧАТЬ ЗАНОВО</button>
+            </div>
+            <div class="menu-item">
+                <button class="menu-btn btn-exit" id="exitBtn">ВЫЙТИ В МЕНЮ</button>
+            </div>
+            <div class="menu-instruction">
+                Нажмите ESC для закрытия меню
+            </div>
+        </div>
+    </div>
+
+    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=722f4f80-99eb-47d8-af1f-0eff526f8546"></script>
+    <script src="{{ url_for('static', filename='js/panorama_basics.js') }}"></script>
+
+    <script>
+        // Получаем элементы
+        const menuOverlay = document.getElementById('menuOverlay');
+        const menuButton = document.getElementById('menuButton');
+        const answerBtn = document.getElementById('answerBtn');
+        const resumeBtn = document.getElementById('resumeBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const exitBtn = document.getElementById('exitBtn');
+
+        // Переменная для хранения текущей локации
+        let currentLocation = null;
+
+        // Функция открытия меню
+        function openMenu() {
+            menuOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Функция закрытия меню
+        function closeMenu() {
+            menuOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Обработчик нажатия ESC
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' || event.key === 'Esc') {
+                if (menuOverlay.classList.contains('active')) {
+                    closeMenu();
+                } else {
+                    openMenu();
+                }
             }
-            [class*="ymaps-2-1-79-panorama-gotoymaps"] {
-                display: none !important;
-                opacity: 0 !important;
-                visibility: hidden !important;
-                pointer-events: none !important;
-                height: 0 !important;
-                width: 0 !important;
+        });
+
+        // Кнопка меню (три полоски)
+        menuButton.addEventListener('click', openMenu);
+
+        // Продолжить игру - закрыть меню
+        resumeBtn.addEventListener('click', closeMenu);
+
+        // Начать заново - перезагрузить страницу
+        restartBtn.addEventListener('click', function() {
+            if (confirm('Вы уверены, что хотите начать игру заново? Прогресс будет потерян.')) {
+                location.reload();
             }
-        </style>
-        <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=722f4f80-99eb-47d8-af1f-0eff526f8546"></script>
-        <script src="{{ url_for('static', filename='js/panorama_basics.js') }}"></script>
-    </head>
-    <body>
-        <div id="player1" class="player"></div>
-    </body>
+        });
+
+        // Выйти в меню - на главную
+        exitBtn.addEventListener('click', function() {
+            if (confirm('Вы уверены, что хотите выйти в главное меню?')) {
+                window.location.href = '/';
+            }
+        });
+
+        answerBtn.addEventListener('click', function() {
+            if (confirm('Вы уверены, что хотите ответить?')) {
+                // Получаем текущую локацию из panorama_basics.js
+                if (window.currentLocation) {
+                    const lat = window.currentLocation.lat;
+                    const lng = window.currentLocation.lng;
+                    const name = window.currentLocation.name || "Неизвестное место";
+                    const roundId = window.currentLocation.id || Date.now();
+
+                    window.location.href = `/map?lat=${lat}&lng=${lng}&name=${encodeURIComponent(name)}&round_id=${roundId}`;
+                } else {
+                    alert('Подождите загрузки панорамы...');
+                }
+            }
+        });
+
+        // Закрытие меню при клике на оверлей
+        menuOverlay.addEventListener('click', function(event) {
+            if (event.target === menuOverlay) {
+                closeMenu();
+            }
+        });
+    </script>
+</body>
 </html>

@@ -23,7 +23,6 @@ login_manager.init_app(app)
 api = Api(app)
 api.add_resource(Location, '/api/location')
 
-
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371
     dlat = math.radians(lat2 - lat1)
@@ -35,10 +34,11 @@ def calculate_distance(lat1, lon1, lat2, lon2):
 
 def calculate_score(distance_km):
     if distance_km <= 0:
-        return 5000
+        return 10000
     alpha = 3100
-    score = 5000 * math.exp(-distance_km / alpha)
-    return min(5000, max(0, round(score)))
+    score = 10000 * math.exp(distance_km / alpha)
+    return min(10000, round(score))
+
 
 
 def update_user_score(user_id, new_score):
@@ -173,8 +173,8 @@ def ans():
                            user_lng=user_lng,
                            correct_lat=correct_lat,
                            correct_lng=correct_lng,
-                           distance=distance,
-                           score=score,
+                           #distance=distance,
+                           #score=score,
                            location_name=location_name)
 
 

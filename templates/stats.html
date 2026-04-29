@@ -45,15 +45,21 @@
 
                             <!-- Максимальный счет -->
                             <div class="col-12 mb-3">
-                                <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
+                                <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border {% if max_score >= 10000 %}rainbow-wavy-card{% endif %}">
                                     <div class="text-start">
                                         <i class="bi bi-trophy fs-4 text-warning"></i>
                                         <span class="ms-2 fw-bold stat-label">Максимальный счет:</span>
                                     </div>
                                     <div>
-                                        <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
-                                            {{ max_score }}
-                                        </span>
+                                        {% if max_score < 10000 %}
+                                            <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
+                                                {{ max_score }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge fs-6 px-3 py-2 shadow-sm golden-shimmer">
+                                                {{ max_score }}
+                                            </span>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

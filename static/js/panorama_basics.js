@@ -1,11 +1,19 @@
 ymaps.ready(function () {
     if (!ymaps.panorama.isSupported()) return;
+
+    // Переменная для хранения текущей локации
+    window.currentLocation = null;
+
     window.findWorldPano = function(attempts) {
         if (attempts <= 0) return;
         fetch('/api/location')
             .then(response => response.json())
-            .then(coords => {
-                ymaps.panorama.locate([coords.lat, coords.lng]).done(function (panoramas) {
+            .then(data => {
+                // Сохраняем текущую локацию
+                window.currentLocation = data;
+                console.log('Текущая локация:', window.currentLocation);
+
+                ymaps.panorama.locate([data.lat, data.lng]).done(function (panoramas) {
                     if (panoramas.length > 0) {
                         var panorama = panoramas[0];
                         var proto = Object.getPrototypeOf(panorama);
@@ -17,8 +25,13 @@ ymaps.ready(function () {
                         findWorldPano(attempts - 1);
                     }
                 });
+            })
+            .catch(error => {
+                console.error('Ошибка загрузки локации:', error);
+                findWorldPano(attempts - 1);
             });
     }
+
     window.put_pano_in_player = function (panorama) {
         if (window.player) {
             window.player.setPanorama(panorama);
@@ -36,5 +49,6 @@ ymaps.ready(function () {
             );
         }
     }
+
     findWorldPano(5);
 });

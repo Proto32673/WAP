@@ -24,43 +24,50 @@
                 <div class="card border-0 shadow-sm mb-4">
                     <div class="card-body p-4">
                         <div class="row g-3">
-                            <div class="col-12 mb-3"> <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
-                                <div class="text-start">
-                                    <i class="bi bi-calendar-plus fs-4 text-success"></i>
-                                    <span class="ms-2 fw-bold stat-label">Дата регистрации:</span>
-                                </div>
-                                <div>
-                                    <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
-                                        {% if current_user.created_date %}
-                                            {{ current_user.created_date.strftime('%d.%m.%Y') }}
-                                        {% else %}
-                                            Потом доделаю
-                                        {% endif %}
-                                    </span>
+                            <!-- Дата регистрации -->
+                            <div class="col-12 mb-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
+                                    <div class="text-start">
+                                        <i class="bi bi-calendar-plus fs-4 text-success"></i>
+                                        <span class="ms-2 fw-bold stat-label">Дата регистрации:</span>
+                                    </div>
+                                    <div>
+                                        <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
+                                            {% if current_user.reg_date %}
+                                                {{ current_user.reg_date.strftime('%d.%m.%Y') }}
+                                            {% else %}
+                                                Нет данных
+                                            {% endif %}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="col-12 mb-3">
-                            <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border">
-                                <div class="text-start">
-                                    <i class="bi bi-trophy fs-4 text-warning"></i>
-                                    <span class="ms-2 fw-bold stat-label">Максимальный счет:</span>
-                                </div>
-                                <div>
-                                    <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
-                                        {% if current_user.max_score %}
-                                            {{ current_user.max_score }}
+                            <!-- Максимальный счет -->
+                            <div class="col-12 mb-3">
+                                <div class="d-flex justify-content-between align-items-center p-3 stat-card rounded-3 border {% if max_score >= 10000 %}rainbow-wavy-card{% endif %}">
+                                    <div class="text-start">
+                                        <i class="bi bi-trophy fs-4 text-warning"></i>
+                                        <span class="ms-2 fw-bold stat-label">Максимальный счет:</span>
+                                    </div>
+                                    <div>
+                                        {% if max_score < 10000 %}
+                                            <span class="badge text-bg-success fs-6 px-3 py-2 shadow-sm">
+                                                {{ max_score }}
+                                            </span>
                                         {% else %}
-                                            Тоже потом доделаю
+                                            <span class="badge fs-6 px-3 py-2 shadow-sm golden-shimmer">
+                                                {{ max_score }}
+                                            </span>
                                         {% endif %}
-                                    </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Кнопки -->
                 <div class="d-flex gap-3 justify-content-center">
                     <a href="/" class="btn btn-outline-success px-4">
                         На главную
@@ -75,4 +82,37 @@
 </div>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+    .user-avatar-large {
+        width: 120px;
+        height: 120px;
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 48px;
+        margin: 0 auto;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        transition: transform 0.2s;
+    }
+    .user-avatar-large:hover {
+        transform: scale(1.05);
+    }
+    .stat-card {
+        transition: all 0.2s;
+        background-color: #f8f9fa;
+    }
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .badge {
+        font-weight: 600;
+        border-radius: 10px;
+    }
+</style>
 {% endblock %}

@@ -7,11 +7,14 @@ from forms.LoginForm import LoginForm
 from forms.Users import RegisterForm
 from data.User import User
 from data import db_session
+from sqlalchemy import desc
 from flask_restful import Api
 from data.Game import Location
 from data.Score import Score
 from data.Room import Room
 import math
+from data.Score import Score
+
 import random
 import string
 
@@ -29,6 +32,27 @@ login_manager.init_app(app)
 api = Api(app)
 api.add_resource(Location, '/api/location')
 
+
+@app.context_processor
+def inject_user():
+    db_sess = db_session.create_session()
+
+    # Получаем топ игроков по максимальному счету
+    try:
+        leaders = db_sess.query(User.name, Score.max_score, Score.user_id) \
+            .join(Score, User.id == Score.user_id) \
+            .order_by(desc(Score.max_score)) \
+            .limit(20) \
+            .all()
+    except Exception as e:
+        print(f"Ошибка получения лидеров: {e}")
+        leaders = []
+
+    db_sess.close()
+
+    return dict(current_user=current_user, leaders=leaders)
+
+
 def calculate_distance(lat1, lon1, lat2, lon2):
     R = 6371
     dlat = math.radians(lat2 - lat1)
@@ -42,9 +66,8 @@ def calculate_score(distance_km):
     if distance_km <= 0:
         return 10000
     alpha = 3100
-    score = 10000 * math.exp(distance_km / alpha)
-    return min(10000, round(score))
-
+    score = 10000 * math.exp(-distance_km / alpha)
+    return min(10000, max(0, round(score)))
 
 def update_user_score(user_id, new_score):
     db_sess = db_session.create_session()
@@ -121,19 +144,10 @@ def main():
     return render_template('entrance.html', photo_url=photo_url)
 
 
-@app.context_processor
-def inject_user():
-    return dict(current_user=current_user)
-
-
-from data.Score import Score
-
-
 @app.route('/stats')
 @login_required
 def stats():
     db_sess = db_session.create_session()
-    # Получаем максимальный счет из таблицы score
     score_record = db_sess.query(Score).filter(Score.user_id == current_user.id).first()
     max_score = score_record.max_score if score_record else 0
     db_sess.close()
@@ -221,8 +235,6 @@ def ans():
                            user_lng=user_lng,
                            correct_lat=correct_lat,
                            correct_lng=correct_lng,
-                           #distance=distance,
-                           #score=score,
                            location_name=location_name)
 
 

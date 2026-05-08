@@ -41,7 +41,7 @@
                 </div>
             </div>
 
-            <!-- Кнопка для начала игры -->
+            <!-- Кнопки для начала игры -->
             <div>
                 <a href="/game" class="btn btn-success btn-lg px-5">
                     Начать одиночную игру
@@ -58,7 +58,7 @@
             <br>
 
             </br>
-            <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#joinRoomModal">
                 Присоединиться к комнате
             </button>
             <div class="modal fade" id="joinRoomModal" tabindex="-1" aria-labelledby="joinRoomModalLabel" aria-hidden="true">
@@ -83,7 +83,8 @@
                     </div>
                 </div>
             </div>
-            <script src="{{ url_for('static', filename='js/JoinRoomLogic.js') }}"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+            <script src="{{ url_for('static', filename='js/JoinButton.js') }}"></script>
         </div>
     </div>
 </div>

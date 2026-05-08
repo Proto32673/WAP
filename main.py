@@ -1,6 +1,8 @@
-from flask import Flask, redirect, render_template, jsonify, session
+from flask_socketio import SocketIO, emit, join_room
+import datetime
 from flask import Flask, redirect, render_template, jsonify, request
 from flask_login import logout_user, login_required, login_user, current_user, LoginManager
+from sqlalchemy import true
 from forms.LoginForm import LoginForm
 from forms.Users import RegisterForm
 from data.User import User
@@ -8,15 +10,18 @@ from data import db_session
 from flask_restful import Api
 from data.Game import Location
 from data.Score import Score
+from data.Room import Room
 import math
 import random
+import string
 
 db_session.global_init("db/geo.db")
 
 photo_url = '/static/images/main_1.jpg'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
+app.config['SECRET_KEY'] = 'yandexlyceum_secret_key1'
+socketio = SocketIO(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -39,7 +44,6 @@ def calculate_score(distance_km):
     alpha = 3100
     score = 10000 * math.exp(distance_km / alpha)
     return min(10000, round(score))
-
 
 
 def update_user_score(user_id, new_score):
@@ -146,8 +150,45 @@ def game():
 
 @app.route('/hub')
 @login_required
-def game_wf():
-    return render_template('hub.html')
+def hub():
+    c_u = request.args.get('code')
+    db_sess = db_session.create_session()
+    if c_u:
+        room = db_sess.query(Room).filter(Room.code == c_u).first()
+        if room:
+            return render_template('hub.html', code=room.code)
+        else:
+            return redirect('/')
+    a_c = list(string.ascii_letters + string.digits)
+    c = "".join(random.choices(a_c, k=4))
+    while db_sess.query(Room).filter(Room.code == c).first():
+        c = "".join(random.choices(a_c, k=4))
+    room = Room()
+    room.code = c
+    room.id_creator = current_user.id
+    room.updated_at = datetime.datetime.now(datetime.timezone.utc)
+    db_sess.add(room)
+    db_sess.commit()
+    db_sess.close()
+    return redirect(f'/hub?code={c}')
+
+
+@socketio.on('join_room')
+def join_room(data):
+    code = data.get('code')
+    db_sess = db_session.create_session()
+    room = db_sess.query(Room).filter(Room.code == code).first()
+    if room:
+        emit('join_success', {'code': code})
+    else:
+        emit('join_error', {'msg': 'Комната не найдена!'})
+
+
+@socketio.on('join')
+def on_join(data):
+    room_code = data.get('room')
+    join_room(room_code)
+    emit('status', {'msg': f'Игрок {current_user.name} в сети!'}, to=room_code)
 
 
 @app.route('/map')
@@ -186,4 +227,4 @@ def ans():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    socketio.run(app, debug=True, allow_unsafe_werkzeug=true)

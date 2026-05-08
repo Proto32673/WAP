@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <title>{% block title %}Комната игрока {{current_user.name}} {% endblock %}</title>
+    <div class="container text-center mt-5">
+        <h1>Комната игрока {{ current_user.name }}</h1>
+        Код :<strong id="room-code" class="display-4">{{ code }}</strong>
+{% endblock %}
 
+{% block scripts %}
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/JoinRoomLogic.js') }}"></script>
 {% endblock %}

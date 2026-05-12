@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const code = Array.from(inputs).map(i => i.value).join('');
         joinBtn.disabled = true;
         joinBtn.innerHTML = 'Проверка...';
-        socket.emit('join_room', { code: code });
+        socket.emit('join_to_room', { code: code });
     });
     socket.on('join_success', (data) => {
         window.location.href = `/hub?code=${data.code}`;

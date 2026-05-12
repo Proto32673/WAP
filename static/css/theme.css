@@ -366,3 +366,49 @@ html, body, .player {
     padding-top: 15px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.leaderboard-table {
+    max-height: 400px;
+    overflow-y: auto;
+}
+.leaderboard-table::-webkit-scrollbar {
+    width: 8px;
+}
+.leaderboard-table::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.leaderboard-table::-webkit-scrollbar-thumb {
+    background: #28a745;
+    border-radius: 10px;
+}
+.rank-1 {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #000;
+}
+.rank-2 {
+    background: linear-gradient(135deg, #c0c0c0 0%, #e0e0e0 100%);
+    color: #000;
+}
+.rank-3 {
+    background: linear-gradient(135deg, #cd7f32 0%, #e0a878 100%);
+    color: #fff;
+}
+.leaderboard-card {
+    transition: transform 0.2s;
+}
+.leaderboard-card:hover {
+    transform: translateY(-3px);
+}
+.user-avatar-small {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 text-center">
+            <h3 class="mb-4">Обновить фото профиля</h3>
+            <form action="" method="post" enctype="multipart/form-data" class="card p-4 shadow-sm">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ form.avatar(class="form-control") }}
+                </div>
+                <div class="d-flex gap-2 justify-content-center">
+                    <a href="/stats" class="btn btn-secondary">Отмена</a>
+                    {{ form.submit(class="btn btn-success") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

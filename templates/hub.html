@@ -1,12 +1,85 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div class="container text-center mt-5">
-        <h1>Комната игрока {{ current_user.name }}</h1>
-        Код :<strong id="room-code" class="display-4">{{ code }}</strong>
-{% endblock %}
+<style>
+    .hub-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .hub-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 40px;
+        max-width: 600px;
+        width: 100%;
+    }
+    .room-code-display {
+        font-family: 'Monaco', monospace;
+        letter-spacing: 5px;
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800;
+        font-size: 4rem;
+        margin: 20px 0;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        font-weight: bold;
+        margin-bottom: 20px;
+        animation: pulse 2s infinite;
+    }
+    .status-waiting {
+        background: rgba(220, 53, 69, 0.2);
+        color: #ff4d5e;
+        border: 1px solid rgba(220, 53, 69, 0.3);
+    }
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.6; }
+        100% { opacity: 1; }
+    }
+    .btn-hub {
+        border-radius: 12px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin: 10px;
+    }
+</style>
 
-{% block scripts %}
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="{{ url_for('static', filename='js/JoinRoomLogic.js') }}"></script>
+<div class="container hub-container">
+    <div class="hub-card text-center">
+        <h1 class="h3 text-white-50 mb-4">Комната игрока <span class="text-white">{{ current_user.name }}</span></h1>
+
+        <div class="status-badge status-waiting" id="status-badge">
+            <i class="bi bi-people-fill me-2"></i> <span id="msg">Ожидание игроков</span>
+        </div>
+
+        <div class="mb-2 text-muted text-uppercase small fw-bold">Код доступа</div>
+        <div id="room-code" class="room-code-display">{{ code }}</div>
+
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+            {% if c_id %}
+                <button id="start-btn" class="btn btn-success btn-lg btn-hub shadow-sm">
+                    <i class="bi bi-play-fill me-2"></i>Начать игру
+                </button>
+            {% endif %}
+            <a href="/" class="btn btn-outline-light btn-lg btn-hub">
+                <i class="bi bi-box-arrow-left me-2"></i>Выйти
+            </a>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script>
+    const ROOM_CODE = "{{ code }}";
+</script>
+<script src="{{ url_for('static', filename='js/RoomLogic.js') }}"></script>
 {% endblock %}

@@ -39,85 +39,18 @@
     </div>
 
     <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=722f4f80-99eb-47d8-af1f-0eff526f8546"></script>
-    <script src="{{ url_for('static', filename='js/panorama_basics.js') }}"></script>
-
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script>
-        // Получаем элементы
-        const menuOverlay = document.getElementById('menuOverlay');
-        const menuButton = document.getElementById('menuButton');
-        const answerBtn = document.getElementById('answerBtn');
-        const resumeBtn = document.getElementById('resumeBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const exitBtn = document.getElementById('exitBtn');
+        const IS_CREATOR_RAW = "{{ c_id }}";
+        const IS_CREATOR = (IS_CREATOR_RAW === 'True' || IS_CREATOR_RAW === 'true' || IS_CREATOR_RAW === '1');
+        const ROOM_CODE = "{{ code }}";
 
-        // Переменная для хранения текущей локации
-        let currentLocation = null;
-
-        // Функция открытия меню
-        function openMenu() {
-            menuOverlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        // Функция закрытия меню
-        function closeMenu() {
-            menuOverlay.classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Обработчик нажатия ESC
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' || event.key === 'Esc') {
-                if (menuOverlay.classList.contains('active')) {
-                    closeMenu();
-                } else {
-                    openMenu();
-                }
-            }
-        });
-
-        // Кнопка меню (три полоски)
-        menuButton.addEventListener('click', openMenu);
-
-        // Продолжить игру - закрыть меню
-        resumeBtn.addEventListener('click', closeMenu);
-
-        // Начать заново - перезагрузить страницу
-        restartBtn.addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите начать игру заново? Прогресс будет потерян.')) {
-                location.reload();
-            }
-        });
-
-        // Выйти в меню - на главную
-        exitBtn.addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите выйти в главное меню?')) {
-                window.location.href = '/';
-            }
-        });
-
-        answerBtn.addEventListener('click', function() {
-            if (confirm('Вы уверены, что хотите ответить?')) {
-                // Получаем текущую локацию из panorama_basics.js
-                if (window.currentLocation) {
-                    const lat = window.currentLocation.lat;
-                    const lng = window.currentLocation.lng;
-                    const name = window.currentLocation.name || "Неизвестное место";
-                    const roundId = window.currentLocation.id || Date.now();
-
-                    window.location.href = `/map?lat=${lat}&lng=${lng}&name=${encodeURIComponent(name)}&round_id=${roundId}`;
-                } else {
-                    alert('Подождите загрузки панорамы...');
-                }
-            }
-        });
-
-        // Закрытие меню при клике на оверлей
-        menuOverlay.addEventListener('click', function(event) {
-            if (event.target === menuOverlay) {
-                closeMenu();
-            }
-        });
     </script>
+    {% if code %}
+        <script src="{{ url_for('static', filename='js/PanoramaBasicsMultiplayer.js') }}"></script>
+    {% else %}
+        <script src="{{ url_for('static', filename='js/PanoramaBasics.js') }}"></script>
+    {% endif %}
+    <script src="{{ url_for('static', filename='js/PanoramaUI.js') }}"></script>
 </body>
 </html>

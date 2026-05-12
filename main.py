@@ -14,6 +14,8 @@ from data.Score import Score
 from data.Room import Room
 import math
 from data.Score import Score
+import os
+from forms.Users import AvatarForm
 
 import random
 import string
@@ -33,17 +35,36 @@ api = Api(app)
 api.add_resource(Location, '/api/location')
 
 
+@app.route('/stats/edit_avatar', methods=['GET', 'POST'])
+@login_required
+def edit_avatar():
+    form = AvatarForm()
+    if form.validate_on_submit():
+        file = form.avatar.data
+        if file:
+            ext = file.filename.split('.')[-1]
+            filename = f"avatar_{current_user.id}.{ext}"
+            path = os.path.join('static/img/avatars', filename)
+            os.makedirs('static/img/avatars', exist_ok=True)
+            file.save(path)
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).get(current_user.id)
+            user.avatar = filename
+            db_sess.commit()
+            return redirect('/stats')
+
+    return render_template('avatar.html', title='Смена аватара', form=form)
+
+
 @app.context_processor
 def inject_user():
     db_sess = db_session.create_session()
 
     # Получаем топ игроков по максимальному счету
     try:
-        leaders = db_sess.query(User.name, Score.max_score, Score.user_id) \
+        leaders = db_sess.query(User.name, Score.max_score, Score.user_id, User.avatar) \
             .join(Score, User.id == Score.user_id) \
-            .order_by(desc(Score.max_score)) \
-            .limit(20) \
-            .all()
+            .order_by(desc(Score.max_score)).limit(20).all()
     except Exception as e:
         print(f"Ошибка получения лидеров: {e}")
         leaders = []
@@ -151,9 +172,6 @@ def stats():
     score_record = db_sess.query(Score).filter(Score.user_id == current_user.id).first()
     max_score = score_record.max_score if score_record else 0
     db_sess.close()
-
-    print(f"DEBUG: user_id={current_user.id}, max_score={max_score}")  # Отладка
-
     return render_template('stats.html', max_score=max_score)
 
 
@@ -162,21 +180,36 @@ def game():
     return render_template('panorama.html')
 
 
+@app.route('/game_m')
+def game_m():
+    code_url = request.args.get('code')
+    db_sess = db_session.create_session()
+    room = db_sess.query(Room).filter(Room.code == code_url).first()
+    r_code = room.code
+    is_creator = (room.id_creator == current_user.id)
+    db_sess.close()
+    return render_template('panorama.html', code=r_code, c_id=is_creator)
+
+
 @app.route('/hub')
 @login_required
 def hub():
-    c_u = request.args.get('code')
+    code_url = request.args.get('code')
     db_sess = db_session.create_session()
-    if c_u:
-        room = db_sess.query(Room).filter(Room.code == c_u).first()
+    if code_url:
+        room = db_sess.query(Room).filter(Room.code == code_url).first()
         if room:
-            return render_template('hub.html', code=room.code)
-        else:
-            return redirect('/')
-    a_c = list(string.ascii_letters + string.digits)
-    c = "".join(random.choices(a_c, k=4))
-    while db_sess.query(Room).filter(Room.code == c).first():
+            r_code = room.code
+            is_creator = (room.id_creator == current_user.id)
+            db_sess.close()
+            return render_template('hub.html', code=r_code, c_id=is_creator)
+        db_sess.close()
+        return redirect('/')
+    a_c = string.ascii_letters + string.digits
+    while True:
         c = "".join(random.choices(a_c, k=4))
+        if not db_sess.query(Room).filter(Room.code == c).first():
+            break
     room = Room()
     room.code = c
     room.id_creator = current_user.id
@@ -187,8 +220,14 @@ def hub():
     return redirect(f'/hub?code={c}')
 
 
-@socketio.on('join_room')
-def join_room(data):
+@app.route('/results')
+def results():
+    code = request.args.get('code')
+    return render_template('results_multiplayer.html', code=code)
+
+
+@socketio.on('join_to_room')
+def join_to_room(data):
     code = data.get('code')
     db_sess = db_session.create_session()
     room = db_sess.query(Room).filter(Room.code == code).first()
@@ -198,16 +237,77 @@ def join_room(data):
         emit('join_error', {'msg': 'Комната не найдена!'})
 
 
+@socketio.on('game_m')
+def game_m(data):
+    code = data.get('code')
+    db_sess = db_session.create_session()
+    room = db_sess.query(Room).filter(Room.code == code).first()
+    if room.id_creator == current_user.id:
+        emit('game_success', {'code': code}, to=code)
+    db_sess.close()
+
+
+room_l = {}
+
+
+@socketio.on('player_move')
+def player_move(data):
+    room = data.get('room')
+    if room:
+        room_l[room] = data
+        emit('update', data, to=room, include_self=False)
+
+
 @socketio.on('join')
 def on_join(data):
-    room_code = data.get('room')
-    join_room(room_code)
-    emit('status', {'msg': f'Игрок {current_user.name} в сети!'}, to=room_code)
+    room = data['room']
+    join_room(room)
+    if room in room_l:
+        emit('update', room_l[room], to=request.sid)
 
 
 @app.route('/map')
 def map_ans():
-    return render_template('map.html')
+    code = request.args.get('code')
+    return render_template('map.html', code=code)
+
+
+room_ans = {}
+
+
+@socketio.on('submit_answer')
+def answer(data):
+    room_code = data.get('room')
+    user_id = current_user.id
+    if room_code not in room_ans:
+        room_ans[room_code] = {}
+    try:
+        u_lat = float(data.get('lat'))
+        u_lng = float(data.get('lng'))
+        c_lat = float(data.get('correctLat'))
+        c_lng = float(data.get('correctLng'))
+    except (TypeError, ValueError):
+        return
+    dist = calculate_distance(u_lat, u_lng, c_lat, c_lng)
+    score = calculate_score(dist)
+    if current_user.is_authenticated:
+        update_user_score(user_id, score)
+    room_ans[room_code][user_id] = {
+        'name': current_user.name,
+        'score': score,
+        'dist': dist,
+        'lat': u_lat,
+        'lng': u_lng
+    }
+    emit('player_answered_notice', {'name': current_user.name}, to=room_code, include_self=False)
+    if len(room_ans[room_code]) >= 2:
+        results_data = {
+            'results': room_ans[room_code],
+            'correctLat': c_lat,
+            'correctLng': c_lng
+        }
+        emit('all_finished', results_data, to=room_code)
+        room_ans[room_code] = {}
 
 
 @app.route('/ans')
@@ -217,7 +317,6 @@ def ans():
     correct_lat = request.args.get('correctLat', type=float)
     correct_lng = request.args.get('correctLng', type=float)
     location_name = request.args.get('name', 'Неизвестное место')
-    round_id = request.args.get('roundId', type=int)
 
     print(f"DEBUG: userLat={user_lat}, userLng={user_lng}")
     print(f"DEBUG: correctLat={correct_lat}, correctLng={correct_lng}")

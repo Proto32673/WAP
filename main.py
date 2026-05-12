@@ -35,7 +35,7 @@ api = Api(app)
 api.add_resource(Location, '/api/location')
 
 
-@app.route('/stats/edit_avatar', methods=['GET', 'POST'])
+@app.route('/profile/edit_avatar', methods=['GET', 'POST'])
 @login_required
 def edit_avatar():
     form = AvatarForm()
@@ -51,7 +51,7 @@ def edit_avatar():
             user = db_sess.query(User).get(current_user.id)
             user.avatar = filename
             db_sess.commit()
-            return redirect('/stats')
+            return redirect('/profile')
 
     return render_template('avatar.html', title='Смена аватара', form=form)
 
@@ -165,14 +165,14 @@ def main():
     return render_template('entrance.html', photo_url=photo_url)
 
 
-@app.route('/stats')
+@app.route('/profile')
 @login_required
-def stats():
+def profile():
     db_sess = db_session.create_session()
     score_record = db_sess.query(Score).filter(Score.user_id == current_user.id).first()
     max_score = score_record.max_score if score_record else 0
     db_sess.close()
-    return render_template('stats.html', max_score=max_score)
+    return render_template('profile.html', max_score=max_score)
 
 
 @app.route('/game')
